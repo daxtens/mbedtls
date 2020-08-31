@@ -285,6 +285,9 @@ cleanup()
     if [ -f "$CONFIG_BAK" ]; then
         mv "$CONFIG_BAK" "$CONFIG_H"
     fi
+
+    # Remove baremetal /usr/include replacement
+    rm -rf baremetal-usr-include
 }
 
 # Executed on exit. May be redefined depending on command line options.
@@ -644,6 +647,28 @@ pre_check_tools () {
     "$@" scripts/output_env.sh
 }
 
+# Set up an include directory for baremetal tests. Exclude headers that the
+# configuration says we shouldn't rely upon.
+pre_setup_baremetal_usr_include () {
+    msg "info: setting up include directory for bare metal tests"
+    case " $RUN_COMPONENTS " in
+        *baremetal*)
+            cp -r /usr/include baremetal-usr-include
+            rm baremetal-usr-include/time.h
+            rm baremetal-usr-include/pthread.h
+            ;;
+    esac
+
+    # We also need a set of CFLAGS to use this. We need to preserve the
+    # compiler's other system include directories, preferably without
+    # assuming too much about the compiler or platform. However, we
+    # assume gcc for now.
+
+    dirs=$(gcc -xc -E -v - < /dev/null 2>&1 | egrep '^ /usr/.*include.*$' | \
+           egrep -v '/usr/include$' | sed 's/^/ -isystem/' | tr -d "\n")
+
+    BAREMETAL_INCLUDE_OVERRIDE="-nostdinc $dirs -I $(pwd)/baremetal-usr-include"
+}
 
 
 ################################################################
@@ -1168,7 +1193,7 @@ component_build_crypto_full () {
 component_build_crypto_baremetal () {
   msg "build: make, crypto only, baremetal config"
   scripts/config.py crypto_baremetal
-  make CFLAGS='-O1 -Werror'
+  make CFLAGS="$BAREMETAL_INCLUDE_OVERRIDE -O1 -Werror"
   if_build_succeeded are_empty_libraries library/libmbedx509.* library/libmbedtls.*
 }
 
@@ -2094,6 +2119,7 @@ pre_prepare_outcome_file
 pre_print_configuration
 pre_check_tools
 cleanup
+pre_setup_baremetal_usr_include
 
 # Run the requested tests.
 for component in $RUN_COMPONENTS; do
