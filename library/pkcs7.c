@@ -297,10 +297,10 @@ static int pkcs7_get_signer_info( unsigned char **p, unsigned char *end_set,
     ret = mbedtls_x509_get_serial( p, end_info, &signer->serial );
     if( ret != 0 )
         return( ret );
-    size_t i;
-    printf("pkcs7 message signer serial: ");
-    for (i = 0; i < signer->serial.len - 1; i++)
-        printf("%02x:", signer->serial.p[i]);
+    ssize_t i;
+    prlog(PR_INFO, "\tpkcs7 message signer serial: ");
+    for (i = 0; i < (ssize_t)signer->serial.len - 1; i++)
+        prlog(PR_INFO, "%02x:", signer->serial.p[i]);
     printf("%02x\n", signer->serial.p[i]);
     ret = pkcs7_get_digest_algorithm( p, end_info,
             &signer->alg_identifier );
