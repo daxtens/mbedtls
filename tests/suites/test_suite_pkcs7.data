@@ -45,3 +45,9 @@ pkcs7_verify_tampered_data:"data_files/pkcs7_data_cert_signed_sha256.der":"data_
 
 PKCS7 Only Signed Data Parse Pass #14
 pkcs7_parse:"data_files/pkcs7_data_cert_signeddata_sha256.der"
+
+PKCS7 Signed Data Parse Failure Corrupt signerInfo.issuer #15.1
+pkcs7_parse_failure:"data_files/pkcs7_signerInfo_issuer_invalid_size.der"
+
+PKCS7 Signed Data Parse Failure Corrupt signerInfo.serial #15.2
+pkcs7_parse_failure:"data_files/pkcs7_signerInfo_serial_invalid_size.der"
