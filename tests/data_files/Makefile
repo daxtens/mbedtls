@@ -1131,6 +1131,18 @@ pkcs7_data_cert_signeddata_sha256.der: pkcs7_data_cert_signed_sha256.der
 	dd if=pkcs7_data_cert_signed_sha256.der of=$@ skip=19 bs=1
 all_final += pkcs7_data_cert_signeddata_sha256.der
 
+## Negative tests
+# For some interesting sizes, what happens if we make them off-by-one?
+pkcs7_signerInfo_issuer_invalid_size.der: pkcs7_data_cert_signed_sha256.der
+	cp $< $@
+	echo -en '\x35' | dd of=$@ seek=919 bs=1 conv=notrunc
+all_final += pkcs7_signerInfo_issuer_invalid_size.der
+
+pkcs7_signerInfo_serial_invalid_size.der: pkcs7_data_cert_signed_sha256.der
+	cp $< $@
+	echo -en '\x15' | dd of=$@ seek=973 bs=1 conv=notrunc
+all_final += pkcs7_signerInfo_serial_invalid_size.der
+
 ################################################################
 #### Meta targets
 ################################################################
