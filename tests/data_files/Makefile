@@ -1199,6 +1199,11 @@ pkcs7_data_cert_encrypted.der: $(pkcs7_test_file) $(pkcs7_test_cert_1)
 	$(OPENSSL) smime -encrypt -aes256 -in pkcs7_data.txt -binary -outform DER -out $@ pkcs7-rsa-sha256-1.crt
 all_final += pkcs7_data_cert_encrypted.der
 
+# pkcs7 signature file just with signed data
+pkcs7_data_cert_signeddata_sha256.der: pkcs7_data_cert_signed_sha256.der
+	dd if=pkcs7_data_cert_signed_sha256.der of=$@ skip=19 bs=1
+all_final += pkcs7_data_cert_signeddata_sha256.der
+
 ################################################################
 #### Meta targets
 ################################################################
