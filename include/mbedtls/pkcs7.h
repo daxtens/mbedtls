@@ -142,6 +142,7 @@ mbedtls_pkcs7_signed_data;
  */
 typedef struct mbedtls_pkcs7
 {
+    mbedtls_pkcs7_buf raw;
     mbedtls_pkcs7_buf content_type_oid;
     mbedtls_pkcs7_signed_data signed_data;
 }

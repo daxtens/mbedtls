@@ -479,12 +479,18 @@ int mbedtls_pkcs7_parse_der( const unsigned char *buf, const int buflen,
     int ret;
     int isoidset = 0;
 
-    /* use internal buffer for parsing */
-    start = (unsigned char *)buf;
-    end = start + buflen;
-
     if( !pkcs7 )
         return( MBEDTLS_ERR_PKCS7_BAD_INPUT_DATA );
+
+    /* make an internal copy of the buffer for parsing */
+    pkcs7->raw.p = start = mbedtls_calloc( 1, buflen );
+    if( pkcs7->raw.p == NULL )
+    {
+            return( MBEDTLS_ERR_PKCS7_ALLOC_FAILED );
+    }
+    memcpy( start, buf, buflen );
+    pkcs7->raw.len = buflen;
+    end = start + buflen;
 
     ret = pkcs7_get_content_info_type( &start, end, &pkcs7->content_type_oid );
     if( ret != 0 )
@@ -614,6 +620,9 @@ void mbedtls_pkcs7_free( mbedtls_pkcs7 *pkcs7 )
         mbedtls_platform_zeroize( name_prv, sizeof( mbedtls_x509_name ) );
         mbedtls_free( name_prv );
     }
+
+    mbedtls_platform_zeroize( pkcs7->raw.p, pkcs7->raw.len );
+    mbedtls_free( pkcs7->raw.p );
 
     mbedtls_platform_zeroize( pkcs7, sizeof( mbedtls_pkcs7 ) );
 }
