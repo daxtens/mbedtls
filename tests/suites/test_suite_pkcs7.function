@@ -211,6 +211,7 @@ void pkcs7_verify( char *pkcs7_file, char *crt, char *filetobesigned )
 
     res = mbedtls_pkcs7_parse_der( pkcs7_buf, buflen, &pkcs7 );
     TEST_ASSERT( res == MBEDTLS_PKCS7_SIGNED_DATA );
+    mbedtls_free( pkcs7_buf );
 
     res = stat(filetobesigned, &st);
     TEST_ASSERT( res == 0 );
@@ -232,7 +233,6 @@ exit:
     mbedtls_x509_crt_free( &x509 );
     mbedtls_free( data );
     mbedtls_pkcs7_free( &pkcs7 );
-    mbedtls_free( pkcs7_buf );
 }
 /* END_CASE */
 
