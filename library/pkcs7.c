@@ -657,7 +657,8 @@ int mbedtls_pkcs7_signed_data_verify( mbedtls_pkcs7 *pkcs7,
 
         mbedtls_md( md_info, data, datalen, hash );
 
-        ret = mbedtls_pk_verify( &pk_cxt, md_alg, hash, sizeof(hash),
+        ret = mbedtls_pk_verify( &pk_cxt, md_alg, hash,
+                                 mbedtls_md_get_size( md_info ),
                                  signer->sig.p, signer->sig.len );
 
         mbedtls_free( hash );
